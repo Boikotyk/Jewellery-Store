@@ -1,0 +1,49 @@
+/* @font-face {
+  font-family: "";
+  src: url("../fonts/.eot");
+  src: url("../fonts/.eot?#iefix") format("embedded-opentype"),
+    url("../fonts/.woff") format("woff"),
+    url("../fonts/.ttf") format("truetype"), url("../fonts/.svg#") format("svg");
+  font-style: normal;
+  font-weight: normal;
+} */
+
+@font-face {
+  font-family: "Lora";
+  src: url("../fonts/Lora-Regular.woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Marcellus";
+  src: url("../fonts/Marcellus-Regular.woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+ @font-face {
+  font-family: "Lora";
+  src: url("../fonts/Lora-Medium.woff2");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+} 
+
+@font-face {
+  font-family: "Lora";
+  src: url("../fonts/Lora-SemiBold.woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lora";
+  src: url("../fonts/Lora-Bold.woff2");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
