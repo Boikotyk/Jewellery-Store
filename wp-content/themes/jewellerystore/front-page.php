@@ -4,7 +4,7 @@
         <?php if (get_row_layout() == 'hero') : ?>
             <section class="hero section__white">
                 <?php $bg_image = get_sub_field('bg_image'); ?>
-                <div class="overlay" style="background-image: url('<?php echo $bg_image['url']; ?>')"></div>
+                <div class="overlay" style="background-image: url('<?php echo $bg_image['url']; ?>');"></div>
                 <div class="container">
                     <div class="hero__inner">
                         <div class="content__side">
@@ -49,11 +49,11 @@
                                 <div class="btn__box">
                                     <?php $shop_link = get_sub_field('shop_link'); ?>
                                     <?php if ($shop_link) { ?>
-                                        <a class="btn__white" href="<?php echo $shop_link['url']; ?>" target="<?php echo $shop_link['target']; ?>"><?php echo $shop_link['title']; ?></a>
+                                        <a class="btn__black" href="<?php echo $shop_link['url']; ?>" target="<?php echo $shop_link['target']; ?>"><?php echo $shop_link['title']; ?></a>
                                     <?php } ?>
-                                    <?php $hero_link = get_sub_field('hero_link'); ?>
+                                    <?php $hero_link = get_sub_field('intro_link'); ?>
                                     <?php if ($hero_link) { ?>
-                                        <a class="btn__outline" href="<?php echo $hero_link['url']; ?>" target="<?php echo $hero_link['target']; ?>"><?php echo $hero_link['title']; ?></a>
+                                        <a class="btn__black__outline" href="<?php echo $hero_link['url']; ?>" target="<?php echo $hero_link['target']; ?>"><?php echo $hero_link['title']; ?></a>
                                     <?php } ?>
                                 </div>
                             </div>
@@ -74,7 +74,18 @@
                             <?php $shop_link = get_sub_field('shop_link'); ?>
                             <?php if (have_rows('cat_products')) : ?>
                                 <?php while (have_rows('cat_products')) : the_row(); ?>
-                                    <div class="rows block__light">
+                                    <?php
+                                    $category_term = get_sub_field('category');
+                                    $term_id = $category_term->term_id;
+                                    $taxonomy_info = get_term($term_id);
+                                    $taxonomy_prefix = $taxonomy_info->taxonomy;
+                                    $term_id_prefixed = $taxonomy_prefix . '_' . $term_id;
+                                    ?>
+                                    <div class="rows <?php if (get_field('blackwhite', $term_id_prefixed) == 1) {
+                                                            echo 'block__light';
+                                                        } else {
+                                                            echo 'block__dark';
+                                                        } ?>">
                                         <div class="column left">
                                             <div class="content__side">
                                                 <div class="products__prev">
@@ -134,10 +145,9 @@
                                     <div class="img__box">
                                         <?php $video_image = get_sub_field('video_image'); ?>
                                         <video controls crossorigin playsinline poster="<?php echo $video_image['url']; ?>">
-                                            <source src="<?php the_sub_field('video_link'); ?>" type="video/mp4" size="576">
+                                            <source src="<?php the_sub_field('video_link'); ?>" type="video/mp4">
+                                        </video>
                                     </div>
-
-                                    </video>
                                 </div>
                             </div>
                         </div>
@@ -248,7 +258,7 @@
                                         if ($query_featured->have_posts()) :
                                     ?>
                                             <div class="offer2__column">
-                                                <div class="title">FEATURED PRODUCTS</div>
+                                                <div class="title"><?php _e('FEATURED PRODUCTS'); ?></div>
                                                 <div class="product__items">
                                                     <?php while ($query_featured->have_posts()) : $query_featured->the_post(); ?>
                                                         <div class="product__item">
@@ -298,7 +308,7 @@
                                         if ($query_new->have_posts()) :
                                     ?>
                                             <div class="offer2__column">
-                                                <div class="title">NEW PRODUCTS</div>
+                                                <div class="title"><?php _e('NEW PRODUCTS'); ?></div>
                                                 <div class="product__items">
                                                     <?php while ($query_new->have_posts()) : $query_new->the_post(); ?>
                                                         <div class="product__item">
@@ -373,7 +383,7 @@
                                                             <?php echo get_avatar(get_the_author_meta('ID'), 32); ?>
                                                             <span><?php the_author(); ?></span>
                                                         </div>
-                                                        <p><?php the_excerpt(); ?></p>
+                                                        <?php the_excerpt(); ?>
                                                         <div class="btn__box">
                                                             <a class="link__gold" href="<?php the_permalink(); ?>" target="_blank" rel="noopener noreferrer"><?php _e('Continue reading'); ?></a>
                                                         </div>

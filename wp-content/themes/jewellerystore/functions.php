@@ -20,18 +20,23 @@ function widgets_init_footer()
     register_sidebar(array(
         'name' => 'OUR STORES',
         'id' => 'our_stores',
-        'before_widget' => '<ul class="footer__munu">',
-        'after_widget' => '</ul>',
+        'before_widget' => '',
+        'after_widget' => ''
     ));
     register_sidebar(array(
         'name' => 'USEFUL LINKS',
         'id' => 'useful_links',
-        'before_widget' => '<ul class="footer__munu">',
-        'after_widget' => '</ul>',
+        'before_widget' => '',
+        'after_widget' => ''
     ));
 }
 add_action('widgets_init', 'widgets_init_footer');
-
+function custom_widget_title($title)
+{
+    $title = trim($title);
+    return $title;
+}
+add_filter('widget_title', 'custom_widget_title');
 
 function custom_theme_customize_register($wp_customize)
 {
@@ -69,6 +74,15 @@ function custom_theme_customize_register($wp_customize)
 
     $wp_customize->add_control('footer_address', array(
         'label'    => __('Footer Address'),
+        'section'  => 'title_tagline',
+        'type'     => 'text',
+    ));
+    $wp_customize->add_setting('footer_address_link', array(
+        'default'           => '',
+        'sanitize_callback' => 'wp_kses_post',
+    ));
+    $wp_customize->add_control('footer_address_link', array(
+        'label'    => __('Footer Address Link'),
         'section'  => 'title_tagline',
         'type'     => 'text',
     ));
@@ -141,12 +155,12 @@ class Custom_Walker_Nav_Menu extends Walker
         $t = isset($args->item_spacing) && 'discard' === $args->item_spacing ? '' : "\t";
         $n = isset($args->item_spacing) && 'discard' === $args->item_spacing ? '' : "\n";
         $indent = str_repeat($t, $depth);
-        $classes = array('sub__menu');
+        $classes = array('sub__menu sub__menu__inner');
         $class_names = implode(' ', apply_filters('nav_menu_submenu_css_class', $classes, $args, $depth));
         $atts = array('class' => !empty($class_names) ? $class_names : '');
         $atts = apply_filters('nav_menu_submenu_attributes', $atts, $args, $depth);
         $attributes = $this->build_atts($atts);
-        $output .= "{$n}{$indent}<ul{$attributes} class=\"sub__menu__inner\">{$n}";
+        $output .= "{$n}{$indent}<ul{$attributes}>{$n}";
     }
 
     public function end_lvl(&$output, $depth = 0, $args = null)
@@ -204,37 +218,6 @@ class Custom_Walker_Nav_Menu extends Walker
     }
 }
 
-function add_menu_link_class($atts, $item, $args)
-{
-    if (property_exists($args, 'link_class')) {
-        $atts['class'] = $args->link_class;
-    }
-    return $atts;
-}
-add_filter('nav_menu_link_attributes', 'add_menu_link_class', 1, 3);
-
-
-function disable_content_editor()
-{
-    if (isset($_GET['post'])) {
-        $post_ID = $_GET['post'];
-    } else if (isset($_POST['post_ID'])) {
-        $post_ID = $_POST['post_ID'];
-    }
-
-    if (!isset($post_ID) || empty($post_ID)) {
-        return;
-    }
-
-    remove_post_type_support('page', 'editor');
-}
-add_action('admin_init', 'disable_content_editor');
-
-
-function my_deregister_scripts()
-{
-    wp_deregister_script('wp-embed');
-}
 
 function custom_featured_product_shortcode($atts)
 {
@@ -298,7 +281,8 @@ add_action('wp_ajax_nopriv_update_cart_quantity', 'update_cart_quantity');
 
 function my_wc_mini_cart_content()
 {
-    $cart = WC()->cart->get_cart(); ?>
+    $cart = WC()->cart->get_cart();
+    $free_shipping_amount = get_option('free_shipping_amount', '1102'); ?>
     <div class="modal__window_content  <?php if (WC()->cart->is_empty()) {
                                             echo 'empty__cart';
                                         }
@@ -316,7 +300,9 @@ function my_wc_mini_cart_content()
             <div class="product__items">
                 <?php foreach ($cart as $cart_item_key => $cart_item) :
                     $_product     = apply_filters('woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key);
-                    $product_id   = apply_filters('woocommerce_cart_item_product_id', $cart_item['product_id'], $cart_item, $cart_item_key); ?>
+                    $product_id   = apply_filters('woocommerce_cart_item_product_id', $cart_item['product_id'], $cart_item, $cart_item_key);
+                    $product_price = $_product->get_price();
+                ?>
 
                     <div class="product__item">
                         <div class="product__item__inner">
@@ -328,8 +314,8 @@ function my_wc_mini_cart_content()
                                     <?php echo $thumbnail; ?> </div>
                             </div>
                             <div class="product__item__content">
-                                <a class="product__remove"><img src="<?php echo get_template_directory_uri();
-                                                                        ?>/assets/img/close-grey.svg" alt="remove-product"></a>
+                                <a class="product__remove" data-product-id="<?php echo esc_attr($product_id); ?>"><img src="<?php echo get_template_directory_uri();
+                                                                                                                            ?>/assets/img/close-grey.svg" alt="remove-product"></a>
                                 <div class="product__title">
                                     <?php echo wp_kses_post(apply_filters('woocommerce_cart_item_name', $_product->get_name(), $cart_item, $cart_item_key)) . '&nbsp;'; ?>
 
@@ -379,16 +365,18 @@ function my_wc_mini_cart_content()
                 <div class="subtotal__title"><?php _e('Subtotal:'); ?></div>
                 <div class="subtotal__price"><?php echo wc_price(WC()->cart->get_subtotal()); ?></div>
             </div>
-            <div class="free__shipping__wrapper">
-                <div class="free__shipping">Add <span class="required__price">$1,102.00</span> to cart and get <span>free shipping!</span> </div>
-                <div class="free__shipping__progres">
-                    <div class="progress__line__wrapper">
-                        <div class="progress__line">
-                            <div class="progress__line__inner"></div>
+            <?php if (!empty($free_shipping_amount)) { ?>
+                <div class="free__shipping__wrapper">
+                    <div class="free__shipping"><?php _e('Add'); ?> <span class="required__price"><?php echo wc_price($free_shipping_amount); ?></span> <?php _e('to cart and get'); ?> <span><?php _e('free shipping!') ?></span> </div>
+                    <div class="free__shipping__progres">
+                        <div class="progress__line__wrapper">
+                            <div class="progress__line">
+                                <div class="progress__line__inner"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            <?php } ?>
             <div class="btn__box">
                 <div class="btn__box">
                     <a class="btn__grey" href="<?php echo wc_get_cart_url(); ?>"><?php _e('VIEW CART'); ?></a>
@@ -398,7 +386,7 @@ function my_wc_mini_cart_content()
             </div>
         </div>
     </div>
-<?php
+    <?php
 }
 
 
@@ -423,41 +411,150 @@ function update_mini_cart()
 add_action('wp_ajax_update_mini_cart', 'update_mini_cart_callback');
 add_action('wp_ajax_nopriv_update_mini_cart', 'update_mini_cart_callback');
 
-function update_mini_cart_callback()
+
+function my_search_function()
 {
-    if (isset($_POST['product_id'], $_POST['quantity'])) {
-        $product_id = sanitize_text_field($_POST['product_id']);
-        $quantity = intval($_POST['quantity']);
+    $search_query = $_GET['search'];
+    $args = array(
+        'post_type' => 'product',
+        's' => $search_query
+    );
 
-        WC()->cart->set_quantity($product_id, $quantity);
+    $query = new WP_Query($args);
 
-        $subtotal = wc_price(WC()->cart->get_subtotal());
-        $cart_quantity = WC()->cart->get_cart_contents_count();
-
-        $response = array(
-            'subtotalHtml' => $subtotal,
-            'quantityHtml' => ' <strong class="product-quantity">' . '&nbsp;' . $quantity . '</strong>',
-        );
-
-        echo json_encode($response);
-    }
+    if ($query->have_posts()) : ?>
+        <ul class="search_list">
+            <?php while ($query->have_posts()) : $query->the_post(); ?>
+                <li><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></li>
+            <?php endwhile; ?>
+        </ul>
+<?php else :
+        echo 'No results found';
+    endif;
 
     wp_die();
 }
-add_action('wp_ajax_remove_product_from_mini_cart', 'remove_product_from_mini_cart_callback');
-add_action('wp_ajax_nopriv_remove_product_from_mini_cart', 'remove_product_from_mini_cart_callback');
+add_action('wp_ajax_my_search', 'my_search_function');
+add_action('wp_ajax_nopriv_my_search', 'my_search_function');
 
-function remove_product_from_mini_cart_callback()
+
+
+add_filter('woocommerce_settings_tabs_array', 'free_shipping_settings_tab', 50);
+
+function free_shipping_settings_tab($tabs)
 {
-    if (isset($_POST['product_id'])) {
-        $product_id = sanitize_text_field($_POST['product_id']);
-        WC()->cart->remove_cart_item($product_id);
-        $subtotal = wc_price(WC()->cart->get_subtotal());
-        $response = array(
-            'subtotalHtml' => $subtotal,
-        );
-        echo json_encode($response);
+    $tabs['prod_cat_addon'] = __('Free Shipping', 'free_shipping');
+    return $tabs;
+}
+
+add_action('woocommerce_settings_tabs_prod_cat_addon', 'free_shipping_settings_tab_content');
+
+function free_shipping_settings_tab_content()
+{
+    woocommerce_admin_fields(free_shipping_get_settings());
+}
+
+function free_shipping_get_settings()
+{
+    $settings = array(
+        'section_title' => array(
+            'name'     => __('Free Shipping Settings', 'free_shipping'),
+            'type'     => 'title',
+            'desc'     => '',
+            'id'       => 'free_shipping_section_title',
+        ),
+        'free_shipping_amount' => array(
+            'name'     => __('Free Shipping Amount', 'free_shipping'),
+            'type'     => 'number',
+            'desc'     => __('Enter the amount required for free shipping', 'free_shipping'),
+            'id'       => 'free_shipping_amount',
+            'css'      => 'min-width:30px;',
+            'std'      => '1102',
+            'desc_tip' => true,
+        ),
+        'section_end' => array(
+            'type' => 'sectionend',
+            'id'   => 'free_shipping_section_end',
+        ),
+    );
+
+    return apply_filters('free_shipping_settings', $settings);
+}
+
+add_action('woocommerce_update_options_prod_cat_addon', 'free_shipping_save_settings');
+
+function free_shipping_save_settings()
+{
+    woocommerce_update_options(free_shipping_get_settings());
+}
+
+add_action('wp_ajax_remove_product_from_cart', 'remove_product_from_cart_callback');
+add_action('wp_ajax_nopriv_remove_product_from_cart', 'remove_product_from_cart_callback');
+
+function remove_product_from_cart_callback()
+{
+    $product_id = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
+
+    if ($product_id > 0) {
+        $cart = WC()->cart;
+
+        foreach ($cart->get_cart() as $cart_item_key => $cart_item) {
+            if ($cart_item['product_id'] == $product_id) {
+                $cart->remove_cart_item($cart_item_key);
+            }
+        }
     }
+
+    my_wc_mini_cart_content();
+    $mini_cart_content = ob_get_clean();
+
+    $cart_quantity = WC()->cart->get_cart_contents_count();
+    $cart_total = WC()->cart->get_cart_total();
+    echo json_encode(array('cart_quantity' => $cart_quantity, 'cart_total' => $cart_total, 'fragments' => array(
+        '.modal__window_content' => $mini_cart_content,
+    ),));
+
+    wp_die();
+}
+
+
+add_action('wp_ajax_update_cart_item_quantity', 'update_cart_item_quantity_callback');
+add_action('wp_ajax_nopriv_update_cart_item_quantity', 'update_cart_item_quantity_callback');
+
+function update_cart_item_quantity_callback()
+{
+    $product_id = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
+    $quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : 1;
+    $update_action = isset($_POST['update_action']) ? sanitize_text_field($_POST['update_action']) : 'plus';
+
+    if ($product_id > 0) {
+        $cart = WC()->cart;
+
+        foreach ($cart->get_cart() as $cart_item_key => $cart_item) {
+            if ($cart_item['product_id'] == $product_id) {
+                if ($update_action === 'plus') {
+                    $quantity++;
+                } elseif ($update_action === 'minus') {
+                    $quantity--;
+                } {
+                    $quantity;
+                }
+
+
+                $cart->set_quantity($cart_item_key, $quantity);
+                break;
+            }
+        }
+    }
+
+    my_wc_mini_cart_content();
+    $mini_cart_content = ob_get_clean();
+
+    $cart_quantity = WC()->cart->get_cart_contents_count();
+    $cart_total = WC()->cart->get_cart_total();
+    echo json_encode(array('cart_quantity' => $cart_quantity, 'cart_total' => $cart_total, 'fragments' => array(
+        '.modal__window_content' => $mini_cart_content,
+    ),));
 
     wp_die();
 }

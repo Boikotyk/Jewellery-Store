@@ -6,7 +6,7 @@
         endwhile; ?>
     <?php else : ?>
         <p>
-            <php _e("No posts found."); ?></php>
+            <?php _e("No posts found."); ?>
         </p>
     <?php endif; ?>
 </main>

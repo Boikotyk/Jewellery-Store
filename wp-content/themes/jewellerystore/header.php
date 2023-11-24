@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <?php wp_head(); ?>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" />
 </head>
 
 <body>
@@ -36,6 +35,33 @@
                             <div class="main__nav__btn__right">
                                 <div class="search__btn__wrapper">
                                     <a class="modal__open" href="#search__modal"><img src="<?php echo get_template_directory_uri(); ?>/assets/img/search.svg" alt="" /></a>
+                                    <div class="modal__window    modal__window__search" id="search__modal">
+                                        <div class="modal__window_content">
+                                            <div class="button__box">
+                                                <button class="modal__window_close close-popup">
+                                                </button>
+                                            </div>
+                                            <div class="madal__window_content_inner">
+                                                <div class="search__results_box">
+                                                    <div class="search__results_box_inner">
+                                                        <div class="search__results_box_inner_top">
+                                                            <form id="form" action="POST" class="global__search_form">
+                                                                <button type="button" class="search__btn">
+                                                                    <img src="<?php echo get_template_directory_uri(); ?>/assets/img/search.svg" alt="">
+                                                                </button>
+                                                                <input type="search" name="search" id="search" placeholder="Search for products">
+                                                                <button id="reset__btn" type="button" class="reset__search">Clear</button>
+                                                            </form>
+                                                        </div>
+                                                        <div class="search__results_box_inner_bottom">
+
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="cart__btn__wrapper">
                                     <a class="cart__btn modal__open" href="#shopping__cart">

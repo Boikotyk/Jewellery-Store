@@ -19,19 +19,19 @@
 						<div class="social__list">
 							<ul>
 								<li>
-									<a href="http://" target="_blank" rel="noopener noreferrer">
+									<a href="<?php echo esc_html(get_theme_mod('footer_address_link')); ?>" target="_blank" rel="noopener noreferrer">
 										<?php $footer_address_icon = get_theme_mod('footer_address_icon'); ?>
 										<img src="<?php echo $footer_address_icon; ?>" alt="gps"><?php echo esc_html(get_theme_mod('footer_address', '451 Wall Street, UK, London')); ?>
 									</a>
 								</li>
 								<li>
-									<a href="tel:<?php echo esc_html(get_theme_mod('footer_phone', '(064) 332-1233')); ?>" target="_blank" rel="noopener noreferrer">
+									<a href="tel:<?php echo str_replace(' ', '', esc_html(get_theme_mod('footer_phone', '(064) 332-1233'))); ?>" target="_blank" rel="noopener noreferrer">
 										<?php $footer_phone_icon = get_theme_mod('footer_phone_icon'); ?>
 										<img src="<?php echo $footer_phone_icon; ?>" alt="phone"><?php echo _('Phone:'); ?> <?php echo esc_html(get_theme_mod('footer_phone', '(064) 332-1233')); ?>
 									</a>
 								</li>
 								<li>
-									<a href="<?php echo esc_html(get_theme_mod('footer_fax', '(099) 453-1357')); ?>" target="_blank" rel="noopener noreferrer">
+									<a href="<?php echo str_replace(' ', '', esc_html(get_theme_mod('footer_fax', '(099) 453-1357'))); ?>" target="_blank" rel="noopener noreferrer">
 										<?php $footer_fax_icon = get_theme_mod('footer_fax_icon'); ?>
 										<img src="<?php echo $footer_fax_icon; ?>" alt="envelop"><?php echo _('Fax:'); ?> <?php echo esc_html(get_theme_mod('footer_fax', '(099) 453-1357')); ?>
 									</a>
@@ -44,7 +44,7 @@
 				</div>
 				<div class="footer__column center">
 					<div class="footer__column__inner">
-						<div class="title"><?php _e('RECENT POSTS'); ?></div>
+						<h5 class="title"><?php _e('RECENT POSTS'); ?></h5>
 
 						<div class="post__items">
 							<?php

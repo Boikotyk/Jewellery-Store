@@ -1,13 +1,3 @@
-/* @font-face {
-  font-family: "";
-  src: url("../fonts/.eot");
-  src: url("../fonts/.eot?#iefix") format("embedded-opentype"),
-    url("../fonts/.woff") format("woff"),
-    url("../fonts/.ttf") format("truetype"), url("../fonts/.svg#") format("svg");
-  font-style: normal;
-  font-weight: normal;
-} */
-
 @font-face {
   font-family: "Lora";
   src: url("../fonts/Lora-Regular.woff2");
@@ -23,13 +13,20 @@
   font-display: swap;
 }
 
- @font-face {
+@font-face {
   font-family: "Lora";
   src: url("../fonts/Lora-Medium.woff2");
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-} 
+}
+@font-face {
+  font-family: "Lora";
+  src: url("../fonts/Lora-MediumItalic.woff2");
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+}
 
 @font-face {
   font-family: "Lora";
@@ -46,4 +43,3 @@
   font-weight: 700;
   font-display: swap;
 }
-

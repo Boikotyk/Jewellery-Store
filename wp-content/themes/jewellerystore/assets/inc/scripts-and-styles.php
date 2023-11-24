@@ -44,4 +44,7 @@ function inclede_style()
 
 	wp_register_style('responsive', get_template_directory_uri() . '/assets/css/responsive.css');
 	wp_enqueue_style('responsive');
+
+	wp_register_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css');
+	wp_enqueue_style('font-awesome');
 }
