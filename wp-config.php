@@ -24,10 +24,10 @@
 define('DB_NAME', 'sun');
 
 /** Database username */
-define('DB_USER', 'admin');
+define('DB_USER', 'root');
 
 /** Database password */
-define('DB_PASSWORD', 'parasolka050');
+define('DB_PASSWORD', '');
 
 /** Database hostname */
 define('DB_HOST', 'localhost');
